@@ -1,11 +1,11 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import requests, os
 
 app = Flask(__name__)
 
-
-BOT_TOKEN = os.getenv("8250719409:AAFWkaVoGoWZQwCG0LFXJLt4KwM8eYr3xGA")
-CHAT_ID = os.getenv(346640905)
+# 🔐 Secrets stored in Render dashboard → Environment Variables
+BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
+CHAT_ID = str(os.getenv("CHAT_ID"))
 
 @app.route('/')
 def home():
@@ -13,16 +13,24 @@ def home():
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    data = request.json
-    message = data.get('message', 'No message content')
-    text = f"📊 TradingView Alert:\n{message}"
+    data = request.get_json(force=True)
+    print("Received from TradingView:", data)
+
+    # Extract message safely
+    message = data.get('message', '⚠️ No message field received.')
+    text = f"📊 <b>TradingView Alert</b>\n\n{message}"
+
+    # Send to Telegram
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    requests.post(url, json={'chat_id': CHAT_ID, 'text': text})
-    return "ok", 200
+    payload = {
+        'chat_id': CHAT_ID,
+        'text': text,
+        'parse_mode': 'HTML'
+    }
+    response = requests.post(url, json=payload)
+    print("Telegram response:", response.text)
+
+    return jsonify({"status": "ok"}), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
-
-
-
