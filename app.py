@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 
 BOT_TOKEN = os.getenv("8250719409:AAFWkaVoGoWZQwCG0LFXJLt4KwM8eYr3xGA")
-CHAT_ID = os.getenv(6990746336)
+CHAT_ID = os.getenv(346640905)
 
 @app.route('/')
 def home():
@@ -22,6 +22,7 @@ def webhook():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+
 
 
 
